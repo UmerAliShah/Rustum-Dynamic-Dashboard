@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="./Assets/js/superbase.js"></script>
+  <script src="./Assets/js/auth.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rustam Dynamics - Machinery & Plants</title>
+  <link rel="shortcut icon" type="image/x-icon" href="Assets/logo/favicon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://kit.fontawesome.com/088d3f36f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="Assets/css/style1.css">
+<link rel="stylesheet" href="Assets/css/style2.css">
+</head>
+<body>
+  <script>
+    // Check authentication on page load
+    (async function checkAuthOnLoad() {
+        try {
+            const { data: { user }, error } = await window.supabase.auth.getUser();
+            if (error || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+        } catch (err) {
+            console.error('Auth check failed:', err);
+            window.location.href = 'index.html';
+        }
+    })();
+  </script>
+<button class="sidebar-toggler" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+  <button class="theme-toggler" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+  <div class="wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="text-center mb-4">
+        <img src="Assets/logo/logo-light.png" alt="Logo" style="max-width: 230px;">
+      </div>
+      <a href="home.html">Home</a>
+      <a href="addsection.html">Add Section with 2 Images & Text</a>
+      <a href="adds&b.html">Add service & bar In Home</a>
+      <a href="addt&l.html">Add Testimonial & Logo In Home</a>
+      <a href="about us.html">About us</a>
+      <a href="addABC.html">Add about us content</a>
+      <a href="currentproject.html">Current Project</a>
+      <a href="completeproject.html">Complete Project</a>
+      <a href="addproject.html">Add Projects</a>
+      <a href="machineryandplants.html">Machinery and Plants</a>
+      <a href="addM&P.html">Add Machinery and Plants</a>
+      <a href="ourteam.html">Our team</a>
+      <a href="addteammember.html">Add team member</a>
+      <a href="contact.html">Contact</a>
+      <a href="#" onclick="window.auth.logout(); return false;">Logout</a>
+    </div>
+  <div class="main-content">
+    <h3>Add Machinery</h3>
+    <div class="form-section">
+      <form id="machineryForm">
+        <input type="text" id="machineryTitle" class="form-control mb-2" placeholder="Machinery Title" required>
+        <input type="file" id="machineryImages" multiple accept="image/*" class="form-control mb-3">
+        <button class="btn btn-warning">Add Machinery</button>
+      </form>
+      <div id="machineryList"></div>
+    </div>
+
+    <h3>Add Plants</h3>
+    <div class="form-section">
+      <form id="plantsForm">
+        <input type="text" id="plantsTitle" class="form-control mb-2" placeholder="Plants Title" required>
+        <input type="file" id="plantsImages" multiple accept="image/*" class="form-control mb-3">
+        <button class="btn btn-warning">Add Plants</button>
+      </form>
+      <div id="plantsList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="editForm">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Entry</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editKey">
+          <input type="hidden" id="editIndex">
+          <input type="text" id="editTitle" class="form-control mb-2" required>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-warning">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="toast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="Assets/js/add-mp.js"></script>
+<script>
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("show");
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle("dark-mode");
+    }
+</script>
+<script>
+const machineryData = JSON.parse(localStorage.getItem('machinery') || '[]');
+const plantsData = JSON.parse(localStorage.getItem('plants') || '[]');
+
+function saveData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+function renderList(data, containerId, key) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  data.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'entry-card';
+    div.innerHTML = `
+      <h5>${item.title}</h5>
+      <div>${item.images.map(img => `<img src="${img}"/>`).join('')}</div>
+      <button class="btn btn-warning btn-sm mt-2" onclick="editItem('${key}', ${i})">Edit</button>
+      <button class="btn btn-danger btn-sm mt-2" onclick="deleteItem('${key}', ${i})">Delete</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function handleForm(formId, titleId, imageId, data, storageKey, listId) {
+  document.getElementById(formId).addEventListener('submit', e => {
+    e.preventDefault();
+    const title = document.getElementById(titleId).value;
+    const files = document.getElementById(imageId).files;
+    const promises = [...files].map(f => new Promise(r => {
+      const reader = new FileReader();
+      reader.onload = () => r(reader.result);
+      reader.readAsDataURL(f);
+    }));
+    Promise.all(promises).then(images => {
+      data.unshift({ title, images });
+      saveData(storageKey, data);
+      renderList(data, listId, storageKey);
+      document.getElementById(formId).reset();
+    });
+  });
+}
+
+function editItem(key, index) {
+  const data = JSON.parse(localStorage.getItem(key));
+  document.getElementById('editKey').value = key;
+  document.getElementById('editIndex').value = index;
+  document.getElementById('editTitle').value = data[index].title;
+  new bootstrap.Modal(document.getElementById('editModal')).show();
+}
+
+function deleteItem(key, index) {
+  const data = JSON.parse(localStorage.getItem(key));
+  data.splice(index, 1);
+  saveData(key, data);
+  renderList(data, key === 'machinery' ? 'machineryList' : 'plantsList', key);
+}
+
+document.getElementById('editForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const key = document.getElementById('editKey').value;
+  const index = +document.getElementById('editIndex').value;
+  const title = document.getElementById('editTitle').value;
+  const data = JSON.parse(localStorage.getItem(key));
+  data[index].title = title;
+  saveData(key, data);
+  bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+  renderList(data, key === 'machinery' ? 'machineryList' : 'plantsList', key);
+});
+
+handleForm('machineryForm', 'machineryTitle', 'machineryImages', machineryData, 'machinery', 'machineryList');
+handleForm('plantsForm', 'plantsTitle', 'plantsImages', plantsData, 'plants', 'plantsList');
+renderList(machineryData, 'machineryList', 'machinery');
+renderList(plantsData, 'plantsList', 'plants');
+</script>
+</body>
+</html>
+
+
+

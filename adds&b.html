@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="./superbase.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rustam Dynamics Dashboard</title>
+  <link rel="shortcut icon" type="image/x-icon" href="Assets/logo/favicon.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://kit.fontawesome.com/088d3f36f9.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="Assets/css/style1.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background-color: var(--bs-body-bg);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .wrapper {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+    }
+    .sidebar {
+      flex-shrink: 0;
+      width: 250px;
+      background-color: var(--sidebar-bg, #000);
+      color: var(--sidebar-color, #fff);
+      padding: 30px 20px;
+    }
+    .sidebar a {
+      color: inherit;
+      display: block;
+      padding: 10px 0;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .sidebar a:hover {
+      color: #ffc107;
+    }
+    .main-content {
+      flex-grow: 1;
+      padding: 60px 30px;
+      background-color: var(--main-bg, #f8f9fa);
+    }
+    #toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+    .toast {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Check authentication on page load
+    (async function checkAuthOnLoad() {
+        try {
+            const { data: { user }, error } = await window.supabase.auth.getUser();
+            if (error || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+        } catch (err) {
+            console.error('Auth check failed:', err);
+            window.location.href = 'index.html';
+        }
+    })();
+  </script>
+<div class="wrapper">
+  <div class="sidebar" id="sidebar">
+    <div class="text-center mb-4 mt-2">
+      <img src="Assets/logo/logo-light.png" alt="Logo" style="max-width: 200px;">
+    </div>
+    <a href="home.html">Home</a>
+    <a href="addsection.html">Add Section with 2 Images & Text</a>
+    <a href="adds&b.html">Add service & bar In Home</a>
+    <a href="addt&l.html">Add Testimonial & Logo In Home</a>
+    <a href="about us.html">About us</a>
+    <a href="addABC.html">Add about us content</a>
+    <a href="currentproject.html">Current Project</a>
+    <a href="completeproject.html">Complete Project</a>
+    <a href="addproject.html">Add Projects</a>
+    <a href="machineryandplants.html">Machinery and Plants</a>
+    <a href="addM&P.html">Add Machinery and Plants</a>
+    <a href="ourteam.html">Our team</a>
+    <a href="addteammember.html">Add team member</a>
+    <a href="contact.html">Contact</a>
+    <a href="#" onclick="window.auth.logout(); return false;">Logout</a>
+  </div>
+  <div class="main-content">
+    <div class="container py-4">
+      <h3>Add Services Section</h3>
+      <form id="serviceForm" class="row g-3 mb-4">
+        <div class="col-md-3">
+          <label>Image</label>
+          <input type="file" accept="image/*" class="form-control" id="serviceImg" required>
+        </div>
+        <div class="col-md-3">
+          <label>Heading</label>
+          <input type="text" class="form-control" id="serviceHeading" required>
+        </div>
+        <div class="col-md-4">
+          <label>Paragraph</label>
+          <textarea class="form-control" id="servicePara" rows="2" required></textarea>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-warning w-100">Add Service</button>
+        </div>
+      </form>
+      <table class="table table-bordered text-center" id="serviceTable">
+        <thead class="table-dark">
+          <tr>
+            <th>Image</th>
+            <th>Heading</th>
+            <th>Paragraph</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <hr class="my-5">
+      <h3>Add Progress Bar Section</h3>
+      <form id="barForm" class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" id="barTitle" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Progress (%)</label>
+          <input type="number" class="form-control" id="barValue" min="0" max="100" required>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-warning w-100">Add</button>
+        </div>
+      </form>
+      <table class="table table-bordered text-center" id="barTable">
+        <thead class="table-dark">
+          <tr>
+            <th>Title</th>
+            <th>Progress</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Service Modal -->
+<div class="modal fade" id="editServiceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editServiceForm">
+          <input type="hidden" id="editServiceIndex">
+          <div class="mb-3">
+            <label class="form-label">Heading</label>
+            <input type="text" class="form-control" id="editServiceHeading" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Paragraph</label>
+            <textarea class="form-control" id="editServiceParagraph" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-warning">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Progress Bar Modal -->
+<div class="modal fade" id="editBarModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Progress Bar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editBarForm">
+          <input type="hidden" id="editBarIndex">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" id="editBarTitle" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Progress (%)</label>
+            <input type="number" class="form-control" id="editBarValue" min="0" max="100" required>
+          </div>
+          <button type="submit" class="btn btn-warning">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const barForm = document.getElementById('barForm');
+const barTable = document.querySelector('#barTable tbody');
+const editBarForm = document.getElementById('editBarForm');
+const serviceForm = document.getElementById('serviceForm');
+const serviceTable = document.querySelector('#serviceTable tbody');
+const editServiceForm = document.getElementById('editServiceForm');
+
+let bars = JSON.parse(localStorage.getItem('progressBars')) || [];
+let services = JSON.parse(localStorage.getItem('services')) || [];
+
+function renderBars() {
+  barTable.innerHTML = '';
+  bars.forEach((bar, index) => {
+    barTable.innerHTML += `
+      <tr>
+        <td>${bar.title}</td>
+        <td><div class="progress"><div class="progress-bar" role="progressbar" style="width: ${bar.value}%">${bar.value}%</div></div></td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="openEditBar(${index})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteBar(${index})">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+function renderServices() {
+  serviceTable.innerHTML = '';
+  services.forEach((service, index) => {
+    serviceTable.innerHTML += `
+      <tr>
+        <td><img src="${service.img}" width="80"></td>
+        <td>${service.heading}</td>
+        <td>${service.para}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="openEditService(${index})">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteService(${index})">Delete</button>
+        </td>
+      </tr>`;
+  });
+}
+
+function openEditBar(index) {
+  document.getElementById('editBarIndex').value = index;
+  document.getElementById('editBarTitle').value = bars[index].title;
+  document.getElementById('editBarValue').value = bars[index].value;
+  new bootstrap.Modal(document.getElementById('editBarModal')).show();
+}
+
+function openEditService(index) {
+  document.getElementById('editServiceIndex').value = index;
+  document.getElementById('editServiceHeading').value = services[index].heading;
+  document.getElementById('editServiceParagraph').value = services[index].para;
+  new bootstrap.Modal(document.getElementById('editServiceModal')).show();
+}
+
+editBarForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const index = document.getElementById('editBarIndex').value;
+  bars[index].title = document.getElementById('editBarTitle').value;
+  bars[index].value = document.getElementById('editBarValue').value;
+  localStorage.setItem('progressBars', JSON.stringify(bars));
+  renderBars();
+  bootstrap.Modal.getInstance(document.getElementById('editBarModal')).hide();
+});
+
+editServiceForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const index = document.getElementById('editServiceIndex').value;
+  services[index].heading = document.getElementById('editServiceHeading').value;
+  services[index].para = document.getElementById('editServiceParagraph').value;
+  localStorage.setItem('services', JSON.stringify(services));
+  renderServices();
+  bootstrap.Modal.getInstance(document.getElementById('editServiceModal')).hide();
+});
+
+function deleteBar(index) {
+  if (confirm('Are you sure you want to delete this progress bar?')) {
+    bars.splice(index, 1);
+    localStorage.setItem('progressBars', JSON.stringify(bars));
+    renderBars();
+  }
+}
+
+function deleteService(index) {
+  if (confirm('Are you sure you want to delete this service?')) {
+    services.splice(index, 1);
+    localStorage.setItem('services', JSON.stringify(services));
+    renderServices();
+  }
+}
+
+barForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  bars.unshift({
+    title: document.getElementById('barTitle').value,
+    value: document.getElementById('barValue').value
+  });
+  localStorage.setItem('progressBars', JSON.stringify(bars));
+  renderBars();
+  barForm.reset();
+});
+
+serviceForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const file = document.getElementById('serviceImg').files[0];
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    services.unshift({
+      img: event.target.result,
+      heading: document.getElementById('serviceHeading').value,
+      para: document.getElementById('servicePara').value
+    });
+    localStorage.setItem('services', JSON.stringify(services));
+    renderServices();
+    serviceForm.reset();
+  };
+  if (file) reader.readAsDataURL(file);
+});
+
+renderBars();
+renderServices();
+</script>
+</body>
+</html>
+
+
+

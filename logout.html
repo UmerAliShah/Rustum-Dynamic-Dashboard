@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Out...</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="./Assets/js/superbase.js"></script>
+    <script src="./Assets/js/auth.js"></script>
+</head>
+<body>
+  <script>
+    // Check authentication on page load
+    (async function checkAuthOnLoad() {
+        try {
+            const { data: { user }, error } = await window.supabase.auth.getUser();
+            if (error || !user) {
+                window.location.href = 'index.html';
+                return;
+            }
+        } catch (err) {
+            console.error('Auth check failed:', err);
+            window.location.href = 'index.html';
+        }
+    })();
+  </script>
+    <script>
+        // Perform logout when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await window.auth.logout();
+            } catch (err) {
+                console.error('Logout failed:', err);
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,160 @@
+    body {
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    .form-control:focus {
+      box-shadow: none;
+      border-color: #ffc107;
+    }
+    .btn-primary {
+      background-color: #ffc107;
+      border-color: #ffc107;
+    }
+    .btn-primary:hover {
+      background-color: #ffc107;
+    }
+    .alert {
+      margin-top: 15px;
+    }
+
+    /* dashboard page */
+
+     body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background-color: #343a40;
+      color: #fff;
+      position: fixed;
+      padding: 30px 20px;
+    }
+    .sidebar img {
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+    .sidebar a {
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      margin: 10px 0;
+      padding: 8px 10px;
+      border-radius: 5px;
+    }
+    .sidebar a:hover {
+      background-color: #495057;
+      color: #fff;
+    }
+    .main-content {
+      margin-left: 250px;
+      padding: 40px;
+    }
+
+        .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar li {
+      position: relative;
+    }
+
+    .sidebar > ul > li > a {
+      display: block;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #495057;
+    }
+
+    .sidebar ul ul {
+      display: none;
+      background-color: #495057;
+    }
+
+    .sidebar ul ul li a {
+      padding: 10px 30px;
+      font-size: 14px;
+    }
+
+    .sidebar li.active > ul {
+      display: block;
+    }
+
+    .sidebar li > a::after {
+      content: "▼";
+      float: right;
+      font-size: 12px;
+    }
+
+    .sidebar li.active > a::after {
+      content: "▲";
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo img {
+      max-width: 230px;
+    }
+
+    /* Hamburger icon */
+    .hamburger {
+      display: none;
+      font-size: 28px;
+      background: none;
+      color: #343a40;
+      border: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 999;
+      }
+
+      .sidebar.show {
+        transform: translateX(0);
+      }
+
+      .hamburger {
+        display: block;
+      }
+    }
+
+    /* Page content (just for testing) */
+    .content {
+      margin-left: 270px;
+      padding: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        margin-left: 0;
+      }
+    }
