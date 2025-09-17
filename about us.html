@@ -21,16 +21,16 @@
   <script>
     // Check authentication on page load
     (async function checkAuthOnLoad() {
-        try {
-            const { data: { user }, error } = await window.supabase.auth.getUser();
-            if (error || !user) {
-                window.location.href = 'index.html';
-                return;
-            }
-        } catch (err) {
-            console.error('Auth check failed:', err);
-            window.location.href = 'index.html';
+      try {
+        const { data: { user }, error } = await window.supabase.auth.getUser();
+        if (error || !user) {
+          window.location.href = 'index.html';
+          return;
         }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+        window.location.href = 'index.html';
+      }
     })();
   </script>
   <button class="sidebar-toggler" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -60,168 +60,96 @@
 
     <div class="main-content">
       <div class="container">
+
+        <!-- Section 1: Upload Form -->
         <section id="upload-section">
           <div class="form-section mb-4">
-            <h3 class="mb-4">Add About Us Content</h3>
-            <form id="aboutForm" onsubmit="return false;">
+            <h3 class="mb-4">Add Video & Website Text</h3>
+            <form id="uploadForm">
               <div class="row g-3">
-                <div class="col-md-12">
+                <div class="col-md-6">
+                  <label class="form-label">Upload Video</label>
+                  <input type="file" id="videoInput" accept="video/*" class="form-control" required>
+                </div>
+                <div class="col-md-6">
                   <label class="form-label">Heading</label>
                   <input type="text" id="headingInput" class="form-control" required>
                 </div>
-                <div class="col-md-12">
-                  <label class="form-label">Description</label>
-                  <textarea id="descriptionInput" class="form-control" rows="4" required></textarea>
-                </div>
-                <!-- Counter 1 -->
                 <div class="col-md-6">
-                  <label class="form-label">Counter 1 Value</label>
-                  <input type="number" id="counter1Value" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Counter 1 Text</label>
-                  <input type="text" id="counter1Text" class="form-control" required>
-                </div>
-                <!-- Counter 2 -->
-                <div class="col-md-6">
-                  <label class="form-label">Counter 2 Value</label>
-                  <input type="number" id="counter2Value" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Counter 2 Text</label>
-                  <input type="text" id="counter2Text" class="form-control" required>
-                </div>
-                <!-- Counter 3 -->
-                <div class="col-md-6">
-                  <label class="form-label">Counter 3 Value</label>
-                  <input type="number" id="counter3Value" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Counter 3 Text</label>
-                  <input type="text" id="counter3Text" class="form-control" required>
-                </div>
-                <!-- Counter 4 -->
-                <div class="col-md-6">
-                  <label class="form-label">Counter 4 Value</label>
-                  <input type="number" id="counter4Value" class="form-control" required>
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label">Counter 4 Text</label>
-                  <input type="text" id="counter4Text" class="form-control" required>
+                  <label class="form-label">Paragraph</label>
+                  <textarea id="paraInput" class="form-control" rows="3" required></textarea>
                 </div>
                 <div class="col-12">
-                  <button type="submit" id="submitBtn" class="btn btn-primary">Save Content</button>
+                  <label class="form-label">Upload Progress</label>
+                  <div class="progress">
+                    <div id="uploadProgress" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                  </div>
                 </div>
               </div>
+              <button type="submit" class="btn btn-warning w-100 mt-4">Save & Upload</button>
             </form>
           </div>
         </section>
 
+        <!-- Section 2: Uploaded Data Table -->
         <section id="data-section">
           <h4 class="mb-3">Saved Entries</h4>
-          <table class="table table-bordered table-hover" id="aboutTable">
+          <table class="table table-bordered table-hover align-middle text-center" id="sliderTable">
             <thead class="table-dark">
               <tr>
+                <th>Video</th>
                 <th>Heading</th>
-                <th>Description</th>
-                <th>Counter 1</th>
-                <th>Counter 2</th>
-                <th>Counter 3</th>
-                <th>Counter 4</th>
+                <th>Paragraph</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </section>
-      </div>
 
-      <!-- Toast -->
-      <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="uploadToast" class="toast align-items-center text-white border-0" role="alert">
-          <div class="d-flex">
-            <div class="toast-body" id="toastMessage"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        <div class="toast-container">
+          <div id="uploadToast" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+              <div class="toast-body" id="toastMessage">Upload successful!</div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+          </div>
+        </div>
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <form id="editForm">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="editModalLabel">Edit Entry</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" id="editRowIndex">
+                  <div class="mb-3">
+                    <label for="editVideoInput" class="form-label">Change Video</label>
+                    <input type="file" id="editVideoInput" accept="video/*" class="form-control">
+                  </div>
+                  <div class="mb-3">
+                    <label for="editHeading" class="form-label">Heading</label>
+                    <input type="text" id="editHeading" class="form-control" required>
+                  </div>
+                  <div class="mb-3">
+                    <label for="editParagraph" class="form-label">Paragraph</label>
+                    <textarea id="editParagraph" class="form-control" rows="3" required></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-warning">Save changes</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Edit Modal -->
-      <div class="modal fade" id="editModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <form id="editForm">
-              <div class="modal-header">
-                <h5 class="modal-title">Edit About Us Content</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-              </div>
-              <div class="modal-body">
-                <input type="hidden" id="editId">
-                <!-- Add all edit fields similar to the main form -->
-                <div class="mb-3">
-                  <label class="form-label">Heading</label>
-                  <input type="text" id="editHeading" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Description</label>
-                  <textarea id="editDescription" class="form-control" rows="4" required></textarea>
-                </div>
-                <!-- Counter 1 -->
-                <div class="row mb-3">
-                  <div class="col">
-                    <label class="form-label">Counter 1 Value</label>
-                    <input type="number" id="editCounter1Value" class="form-control" required>
-                  </div>
-                  <div class="col">
-                    <label class="form-label">Counter 1 Text</label>
-                    <input type="text" id="editCounter1Text" class="form-control" required>
-                  </div>
-                </div>
-                <!-- Counter 2 -->
-                <div class="row mb-3">
-                  <div class="col">
-                    <label class="form-label">Counter 2 Value</label>
-                    <input type="number" id="editCounter2Value" class="form-control" required>
-                  </div>
-                  <div class="col">
-                    <label class="form-label">Counter 2 Text</label>
-                    <input type="text" id="editCounter2Text" class="form-control" required>
-                  </div>
-                </div>
-                <!-- Counter 3 -->
-                <div class="row mb-3">
-                  <div class="col">
-                    <label class="form-label">Counter 3 Value</label>
-                    <input type="number" id="editCounter3Value" class="form-control" required>
-                  </div>
-                  <div class="col">
-                    <label class="form-label">Counter 3 Text</label>
-                    <input type="text" id="editCounter3Text" class="form-control" required>
-                  </div>
-                </div>
-                <!-- Counter 4 -->
-                <div class="row mb-3">
-                  <div class="col">
-                    <label class="form-label">Counter 4 Value</label>
-                    <input type="number" id="editCounter4Value" class="form-control" required>
-                  </div>
-                  <div class="col">
-                    <label class="form-label">Counter 4 Text</label>
-                    <input type="text" id="editCounter4Text" class="form-control" required>
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save changes</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div> 
     <script src="Assets/js/about-us.js"></script>
-
     <script>
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("show");
@@ -230,9 +158,17 @@
       function toggleTheme() {
         document.body.classList.toggle("dark-mode");
       }
+
+      function showToast(message, success = true) {
+        const toastEl = document.getElementById("uploadToast");
+        const toastMsg = document.getElementById("toastMessage");
+        toastMsg.textContent = message;
+        toastEl.classList.toggle("bg-success", success);
+        toastEl.classList.toggle("bg-danger", !success);
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+      }
     </script>
 </body>
 
 </html>
-
-
