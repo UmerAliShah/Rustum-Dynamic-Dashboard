@@ -167,32 +167,33 @@
             <tbody></tbody>
           </table>
           <hr class="my-5" />
-          <h3>Add Progress Bar Section</h3>
+          <h3>Statistics Section</h3>
           <form id="barForm" class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label class="form-label">Title</label>
-              <input type="text" class="form-control" id="barTitle" required />
+            <div class="col-md-3">
+              <label class="form-label">Projects Completed</label>
+              <input type="text" class="form-control" id="barValue1" placeholder="e.g., 100 billion pkr" required />
             </div>
-            <div class="col-md-4">
-              <label class="form-label">Progress (%)</label>
-              <input
-                type="number"
-                class="form-control"
-                id="barValue"
-                min="0"
-                max="100"
-                required
-              />
+            <div class="col-md-3">
+              <label class="form-label">Current Projects</label>
+              <input type="text" class="form-control" id="barValue2" placeholder="e.g., 50 million pkr" required />
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-              <button type="submit" class="btn btn-warning w-100">Add</button>
+            <div class="col-md-3">
+              <label class="form-label">Team Members</label>
+              <input type="text" class="form-control" id="barValue3" placeholder="e.g., 50" required />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Machinery Inventory</label>
+              <input type="text" class="form-control" id="barValue4" placeholder="e.g., 50" required />
+            </div>
+            <div class="col-md-12 d-flex align-items-end">
+              <button type="submit" class="btn btn-warning w-100">Save Statistics</button>
             </div>
           </form>
           <table class="table table-bordered text-center" id="barTable">
             <thead class="table-dark">
               <tr>
-                <th>Title</th>
-                <th>Progress</th>
+                <th>Category</th>
+                <th>Value</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -248,7 +249,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Edit Progress Bar</h5>
+            <h5 class="modal-title">Edit Statistic</h5>
             <button
               type="button"
               class="btn-close"
@@ -259,22 +260,20 @@
             <form id="editBarForm">
               <input type="hidden" id="editBarIndex" />
               <div class="mb-3">
-                <label class="form-label">Title</label>
+                <label class="form-label">Category</label>
                 <input
                   type="text"
                   class="form-control"
                   id="editBarTitle"
-                  required
+                  disabled
                 />
               </div>
               <div class="mb-3">
-                <label class="form-label">Progress (%)</label>
+                <label class="form-label">Value</label>
                 <input
-                  type="number"
+                  type="text"
                   class="form-control"
                   id="editBarValue"
-                  min="0"
-                  max="100"
                   required
                 />
               </div>
@@ -287,137 +286,16 @@
       </div>
     </div>
 
-    <script>
-      const barForm = document.getElementById("barForm");
-      const barTable = document.querySelector("#barTable tbody");
-      const editBarForm = document.getElementById("editBarForm");
-      const serviceForm = document.getElementById("serviceForm");
-      const serviceTable = document.querySelector("#serviceTable tbody");
-      const editServiceForm = document.getElementById("editServiceForm");
+    <!-- Toast Notification -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="toast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+          <div class="toast-body" id="toastMessage"></div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    </div>
 
-      let bars = JSON.parse(localStorage.getItem("progressBars")) || [];
-      let services = JSON.parse(localStorage.getItem("services")) || [];
-
-      function renderBars() {
-        barTable.innerHTML = "";
-        bars.forEach((bar, index) => {
-          barTable.innerHTML += `
-      <tr>
-        <td>${bar.title}</td>
-        <td><div class="progress"><div class="progress-bar" role="progressbar" style="width: ${bar.value}%">${bar.value}%</div></div></td>
-        <td>
-          <button class="btn btn-sm btn-primary" onclick="openEditBar(${index})">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteBar(${index})">Delete</button>
-        </td>
-      </tr>`;
-        });
-      }
-
-      function renderServices() {
-        serviceTable.innerHTML = "";
-        services.forEach((service, index) => {
-          serviceTable.innerHTML += `
-      <tr>
-        <td><img src="${service.img}" width="80"></td>
-        <td>${service.heading}</td>
-        <td>${service.para}</td>
-        <td>
-          <button class="btn btn-sm btn-primary" onclick="openEditService(${index})">Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteService(${index})">Delete</button>
-        </td>
-      </tr>`;
-        });
-      }
-
-      function openEditBar(index) {
-        document.getElementById("editBarIndex").value = index;
-        document.getElementById("editBarTitle").value = bars[index].title;
-        document.getElementById("editBarValue").value = bars[index].value;
-        new bootstrap.Modal(document.getElementById("editBarModal")).show();
-      }
-
-      function openEditService(index) {
-        document.getElementById("editServiceIndex").value = index;
-        document.getElementById("editServiceHeading").value =
-          services[index].heading;
-        document.getElementById("editServiceParagraph").value =
-          services[index].para;
-        new bootstrap.Modal(document.getElementById("editServiceModal")).show();
-      }
-
-      editBarForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const index = document.getElementById("editBarIndex").value;
-        bars[index].title = document.getElementById("editBarTitle").value;
-        bars[index].value = document.getElementById("editBarValue").value;
-        localStorage.setItem("progressBars", JSON.stringify(bars));
-        renderBars();
-        bootstrap.Modal.getInstance(
-          document.getElementById("editBarModal")
-        ).hide();
-      });
-
-      editServiceForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const index = document.getElementById("editServiceIndex").value;
-        services[index].heading =
-          document.getElementById("editServiceHeading").value;
-        services[index].para = document.getElementById(
-          "editServiceParagraph"
-        ).value;
-        localStorage.setItem("services", JSON.stringify(services));
-        renderServices();
-        bootstrap.Modal.getInstance(
-          document.getElementById("editServiceModal")
-        ).hide();
-      });
-
-      function deleteBar(index) {
-        if (confirm("Are you sure you want to delete this progress bar?")) {
-          bars.splice(index, 1);
-          localStorage.setItem("progressBars", JSON.stringify(bars));
-          renderBars();
-        }
-      }
-
-      function deleteService(index) {
-        if (confirm("Are you sure you want to delete this service?")) {
-          services.splice(index, 1);
-          localStorage.setItem("services", JSON.stringify(services));
-          renderServices();
-        }
-      }
-
-      barForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        bars.unshift({
-          title: document.getElementById("barTitle").value,
-          value: document.getElementById("barValue").value,
-        });
-        localStorage.setItem("progressBars", JSON.stringify(bars));
-        renderBars();
-        barForm.reset();
-      });
-
-      serviceForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const file = document.getElementById("serviceImg").files[0];
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          services.unshift({
-            img: event.target.result,
-            heading: document.getElementById("serviceHeading").value,
-            para: document.getElementById("servicePara").value,
-          });
-          localStorage.setItem("services", JSON.stringify(services));
-          renderServices();
-          serviceForm.reset();
-        };
-        if (file) reader.readAsDataURL(file);
-      });
-
-      renderBars();
-      renderServices();
-    </script>
+    <script src="./Assets/js/adds-b.js"></script>
   </body>
 </html>
